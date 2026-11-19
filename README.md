@@ -1,12 +1,20 @@
 # reddit-aws-bot
 
-Semi-automated drafting assistant for r/AWSForStartuppz posts. Every day it
-researches a trending AWS angle, drafts an informational post (via Groq),
-and sends it to you on Telegram for review. Reply **"done"** and it sends
-back a clean copy-paste-ready version — **you post it to Reddit yourself,
-manually**. (Reddit closed self-service API app creation in late 2025; see
-"Why no auto-posting" below.) Runs entirely on GitHub Actions, triggered by
-cron-job.org pings, so it works even when your laptop is off.
+Semi-automated drafting assistant for r/AWSForStartuppz posts, written as
+short, anonymized client case studies (industry + problem + what was done +
+outcome - never the client's name) from the voice of an AWS cloud
+consulting partner. Every day it researches a trending AWS angle, drafts a
+post (via Groq), and sends it to you on Telegram for review. Reply
+**"done"** and it sends back a clean copy-paste-ready version — **you post
+it to Reddit yourself, manually**. (Reddit closed self-service API app
+creation in late 2025; see "Why no auto-posting" below.) Runs entirely on
+GitHub Actions, triggered by cron-job.org pings, so it works even when your
+laptop is off.
+
+Note: case-study-style posts read more like service marketing than a
+personal story would, even without naming the company, so it's worth
+checking r/AWSForStartuppz's self-promotion rules before these start going
+out regularly.
 
 ## How it works
 
