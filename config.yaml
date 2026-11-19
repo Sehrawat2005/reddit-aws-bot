@@ -3,7 +3,7 @@
 subreddit: "AWSForStartuppz"
 
 # Groq model used to generate draft posts (https://console.groq.com/docs/models)
-groq_model: "llama-3.3-70b-versatile"
+groq_model: "openai/gpt-oss-120b"
 
 # How many of the most recent history entries (approved + rejected) to show
 # the model so it avoids repeating the same angle twice in a row.
