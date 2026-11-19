@@ -12,14 +12,16 @@ from research import pick_angle
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-SYSTEM_PROMPT = """You write Reddit posts for r/{subreddit}, an AWS/cloud \
-startup community. You must output ONLY a single JSON object, no other text, \
-no markdown code fences, with exactly two keys: "title" and "body".
+SYSTEM_PROMPT = """You write short case-study Reddit posts for r/{subreddit}, \
+an AWS/cloud startup community, on behalf of an AWS cloud consulting \
+partner sharing a brief story about a client engagement. You must output \
+ONLY a single JSON object, no other text, no markdown code fences, with \
+exactly two keys: "title" and "body".
 
 Style rules you must follow:
 {style_rules}
 
-The post should center on this angle: "{topic}"
+The case study should center on this angle: "{topic}"
 {context_block}
 Avoid reusing these exact angles already covered recently: {recent}
 """
@@ -35,9 +37,10 @@ def call_groq(config, topic, context, recent):
     api_key = os.environ["GROQ_API_KEY"]
     style_rules = "\n".join(f"- {r}" for r in config["style_rules"])
     context_block = (
-        f"\nFor background, here's a recent real AWS announcement related to "
-        f"this angle - use it only as inspiration for a first-person story, "
-        f"never summarize it like a press release or link to it:\n{context}\n"
+        f"\nFor background, here's a recent real AWS development related to "
+        f"this angle - use it only as plausible inspiration for the kind of "
+        f"problem a client might have hit, never summarize it like a press "
+        f"release or link to it:\n{context}\n"
         if context
         else ""
     )

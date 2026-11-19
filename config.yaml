@@ -9,26 +9,28 @@ groq_model: "openai/gpt-oss-120b"
 # the model so it avoids repeating the same angle twice in a row.
 history_context_size: 8
 
-# Fallback pool of angles, used only when research.py's AWS "What's New" feed
-# fetch fails or every recent item has already been used. The generator picks
-# one that isn't in the recent history and asks the model to write a
-# first-person anecdote around it.
+# Fallback pool of client-engagement scenarios, used only when research.py's
+# AWS "What's New" feed fetch fails or every recent item has already been
+# used. The generator picks one that isn't in the recent history and asks
+# the model to write a short case study around it: the client's industry,
+# the problem they had, what was done, and the outcome.
 topics:
-  - "catching a billing alarm just before a surprise AWS bill"
-  - "forgetting to terminate EC2/EBS resources and what it cost me"
-  - "finding and using AWS free credits / AWS Activate for a small app"
-  - "reserved instances vs savings plans - which actually saved money"
-  - "setting up S3 lifecycle rules to cut storage costs"
-  - "right-sizing an over-provisioned instance after checking CloudWatch"
-  - "using AWS Budgets to get alerted before overspending"
-  - "cost optimization lessons from hiring outside help to audit our AWS bill"
-  - "moving a dev/staging environment to spot instances"
-  - "cleaning up unused Elastic IPs, snapshots, and load balancers"
+  - "a fintech startup hit with unpredictable, spiky EC2 costs"
+  - "an e-commerce retailer whose S3-served images slowed to a crawl during sales traffic"
+  - "a healthtech company needing a HIPAA-aligned architecture on a tight budget"
+  - "a SaaS company stuck on outdated reserved instances paying for capacity it didn't use"
+  - "a logistics company whose Redshift analytics pipeline costs spiraled"
+  - "an edtech startup whose app went down during a traffic spike with no auto-scaling"
+  - "a media company drowning in S3 storage costs from never-expiring old assets"
+  - "a small agency that got blindsided by a surprise AWS bill with no budget alerts set up"
+  - "a marketplace startup whose database couldn't keep up during a product launch"
+  - "a manufacturing company migrating legacy on-prem infrastructure to AWS on a deadline"
 
 style_rules:
-  - "Write in first person, as a genuine personal anecdote (I ran into X, here's what I did)."
-  - "Purely informational / experience-sharing tone - must NOT read as an ad."
-  - "Never include links, company names, discount codes, referral codes, or a call to action."
-  - "Never say 'DM me' or promote a specific paid service by name."
-  - "Keep it concise: a short story, the lesson learned, and one practical tip."
+  - "Written in first-person plural ('we'), as an AWS cloud consulting partner briefly sharing a client engagement."
+  - "NEVER mention the client's name or any identifying details - only their industry/business type (e.g. 'a fintech startup', 'an e-commerce retailer')."
+  - "Structure as a short case study: 1) the problem the client was facing, 2) what was done to help, 3) the outcome/result (use a plausible concrete number, e.g. a cost or performance improvement percentage)."
+  - "Keep it SHORT and crisp - a few tight paragraphs, not a long-form write-up. Written to be skimmed and engaged with, not read like a report."
+  - "Informational and genuinely interesting, not a sales pitch - must NOT read as an ad."
+  - "Never include links, your own company's name, pricing, discount/referral codes, or a call to action like 'DM me' or 'contact us'."
   - "This is a self-text (text-only) post - do not include a URL."
