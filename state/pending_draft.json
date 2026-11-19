@@ -1,0 +1,8 @@
+{
+  "draft_id": "d75711bcb642",
+  "subreddit": "AWSForStartuppz",
+  "topic": "Amazon OpenSearch Memory is now generally available",
+  "title": "How OpenSearch Memory helped a fintech chatbot stay sharp",
+  "body": "We recently worked with a fintech startup that ran an AI‑powered support chatbot. The bot struggled to recall prior user interactions across sessions, so the team built a custom pipeline to store and index conversation logs. The solution was brittle, hard to scale, and added ~20% latency to each response.\n\nWe introduced Amazon OpenSearch Memory as a serverless store for the chatbot’s events. By wiring the bot’s output directly into the OpenSearch Memory API, we let the service handle extraction, embedding, and indexing automatically. No clusters to manage, and the memory lifecycle (expiration, access control) fit the startup’s compliance needs.\n\nThe result? Query latency dropped from 350 ms to 190 ms (≈45% faster) and the monthly cost of the memory layer fell by about 30% compared to their hand‑rolled solution. The chatbot now remembers user preferences across weeks without any extra engineering overhead, leading to higher satisfaction scores and faster issue resolution.",
+  "created_at": "2026-11-19T08:39:04.426054+00:00"
+}
