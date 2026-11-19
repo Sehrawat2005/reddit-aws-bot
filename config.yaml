@@ -1,0 +1,37 @@
+# Reddit auto-posting config
+
+subreddit: "AWSForStartuppz"
+
+# Groq model used to generate draft posts (https://console.groq.com/docs/models)
+groq_model: "llama-3.3-70b-versatile"
+
+# How many of the most recent history entries (posted + rejected) to show the
+# model so it avoids repeating the same angle twice in a row.
+history_context_size: 8
+
+# Minimum hours that must pass since our last successful submission to this
+# subreddit before we're allowed to submit again (defensive duplicate guard).
+min_hours_between_posts: 20
+
+# Rotating pool of angles to write about. The generator picks one that isn't
+# in the recent history, and asks the model to write a first-person anecdote
+# around it.
+topics:
+  - "catching a billing alarm just before a surprise AWS bill"
+  - "forgetting to terminate EC2/EBS resources and what it cost me"
+  - "finding and using AWS free credits / AWS Activate for a small app"
+  - "reserved instances vs savings plans - which actually saved money"
+  - "setting up S3 lifecycle rules to cut storage costs"
+  - "right-sizing an over-provisioned instance after checking CloudWatch"
+  - "using AWS Budgets to get alerted before overspending"
+  - "cost optimization lessons from hiring outside help to audit our AWS bill"
+  - "moving a dev/staging environment to spot instances"
+  - "cleaning up unused Elastic IPs, snapshots, and load balancers"
+
+style_rules:
+  - "Write in first person, as a genuine personal anecdote (I ran into X, here's what I did)."
+  - "Purely informational / experience-sharing tone - must NOT read as an ad."
+  - "Never include links, company names, discount codes, referral codes, or a call to action."
+  - "Never say 'DM me' or promote a specific paid service by name."
+  - "Keep it concise: a short story, the lesson learned, and one practical tip."
+  - "This is a self-text (text-only) post - do not include a URL."
