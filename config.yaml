@@ -1,21 +1,18 @@
-# Reddit auto-posting config
+# Reddit draft-generation config (posting itself is manual - see README)
 
 subreddit: "AWSForStartuppz"
 
 # Groq model used to generate draft posts (https://console.groq.com/docs/models)
 groq_model: "llama-3.3-70b-versatile"
 
-# How many of the most recent history entries (posted + rejected) to show the
-# model so it avoids repeating the same angle twice in a row.
+# How many of the most recent history entries (approved + rejected) to show
+# the model so it avoids repeating the same angle twice in a row.
 history_context_size: 8
 
-# Minimum hours that must pass since our last successful submission to this
-# subreddit before we're allowed to submit again (defensive duplicate guard).
-min_hours_between_posts: 20
-
-# Rotating pool of angles to write about. The generator picks one that isn't
-# in the recent history, and asks the model to write a first-person anecdote
-# around it.
+# Fallback pool of angles, used only when research.py's AWS "What's New" feed
+# fetch fails or every recent item has already been used. The generator picks
+# one that isn't in the recent history and asks the model to write a
+# first-person anecdote around it.
 topics:
   - "catching a billing alarm just before a surprise AWS bill"
   - "forgetting to terminate EC2/EBS resources and what it cost me"

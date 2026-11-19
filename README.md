@@ -1,35 +1,57 @@
 # reddit-aws-bot
 
-Semi-automated Reddit poster for r/AWSForStartuppz. Every day it drafts an
-AWS/cloud informational post (via Groq), sends it to you on Telegram for
-Approve/Reject, and only posts to Reddit once you approve. Runs entirely on
-GitHub Actions, triggered by cron-job.org pings, so it works even when your
-laptop is off.
+Semi-automated drafting assistant for r/AWSForStartuppz posts. Every day it
+researches a trending AWS angle, drafts an informational post (via Groq),
+and sends it to you on Telegram for review. Reply **"done"** and it sends
+back a clean copy-paste-ready version — **you post it to Reddit yourself,
+manually**. (Reddit closed self-service API app creation in late 2025; see
+"Why no auto-posting" below.) Runs entirely on GitHub Actions, triggered by
+cron-job.org pings, so it works even when your laptop is off.
 
 ## How it works
 
 - **Daily** (cron-job.org -> GitHub `repository_dispatch` -> `daily-draft.yml`):
   if a draft is already waiting on a decision, you get a reminder; otherwise
-  a new draft is generated and sent to Telegram.
-- **Every few minutes** (cron-job.org -> `poll-approvals.yml`): checks if you
-  tapped Approve or Reject on Telegram.
-  - Approve -> posts to r/AWSForStartuppz, confirms back on Telegram.
-  - Reject -> discards the draft and immediately generates + sends a new one.
+  it researches a fresh angle and sends a new draft to Telegram.
+  - Research first checks AWS's official "What's New" RSS feed for a recent,
+    not-yet-used announcement to riff on; if that fails or everything recent
+    has already been used, it falls back to the evergreen topic pool in
+    `config.yaml`.
+- **Every few minutes** (cron-job.org -> `poll-approvals.yml`): checks for a
+  text reply on Telegram to the pending draft:
+  - **`done`** -> sends back the title/body in a copy-paste-ready message.
+    Paste the title into Reddit's title field and the body into the text
+    box, yourself, on reddit.com. Logged to `state/history.json` so it's
+    never regenerated.
+  - **`reject`** -> discards the draft and immediately researches + sends a
+    new one.
+  - **anything else** -> treated as a specific topic you want written about.
+    This takes priority over whatever is pending - the current draft (if
+    any) is dropped and a new one is generated for exactly that topic, no
+    matter where things stood.
 
-State (`state/*.json`) is committed back to the repo by the workflow itself,
-so there's no external database.
+State (pending draft, Telegram update offset, draft history) lives as JSON
+files in `state/`, committed back to the repo by the Actions bot itself - no
+external database. Topics already in `history.json` (posted or rejected)
+are never picked again for the researched/evergreen flow, and a custom
+topic you type gets a heads-up if you've already posted that exact angle
+before (it still generates it - that's an explicit request, not a dedupe
+decision).
+
+## Why no auto-posting
+
+Reddit closed self-service API app creation in November 2025 (the
+"Responsible Builder Policy") - creating a new app at reddit.com/prefs/apps
+now requires manual approval from Reddit, which isn't guaranteed or fast.
+Rather than block on that, this bot does everything *except* the final
+submit: you stay the one actually clicking "Post" on reddit.com, which also
+means there's no bot-automation risk to the account at all. If a Reddit API
+app ever gets approved later, `poll_telegram.py`'s `handle_done` is the only
+place that would need to change to re-add auto-posting.
 
 ## One-time setup
 
-### 1. Reddit app
-
-1. Go to https://www.reddit.com/prefs/apps while logged into the account
-   that will post.
-2. Create app -> type **script**. Any name/redirect URI works (e.g.
-   `http://localhost:8080`).
-3. Note the client id (under the app name) and client secret.
-
-### 2. Telegram bot
+### 1. Telegram bot
 
 1. Message **@BotFather** on Telegram -> `/newbot` -> follow prompts -> copy
    the bot token.
@@ -38,32 +60,27 @@ so there's no external database.
    copy the `chat.id` field from the response - that's your
    `TELEGRAM_CHAT_ID`.
 
-### 3. Groq API key
+### 2. Groq API key
 
 Create one at https://console.groq.com/keys.
 
-### 4. GitHub repo secrets
+### 3. GitHub repo secrets
 
 In the repo -> Settings -> Secrets and variables -> Actions, add:
 
 | Secret | Value |
 |---|---|
-| `GROQ_API_KEY` | from step 3 |
-| `TELEGRAM_BOT_TOKEN` | from step 2 |
-| `TELEGRAM_CHAT_ID` | from step 2 |
-| `REDDIT_CLIENT_ID` | from step 1 |
-| `REDDIT_CLIENT_SECRET` | from step 1 |
-| `REDDIT_USERNAME` | the Reddit account's username |
-| `REDDIT_PASSWORD` | the Reddit account's password |
-| `REDDIT_USER_AGENT` | any descriptive string, e.g. `reddit-aws-bot/1.0 by u/<your-username>` |
+| `GROQ_API_KEY` | from step 2 |
+| `TELEGRAM_BOT_TOKEN` | from step 1 |
+| `TELEGRAM_CHAT_ID` | from step 1 |
 
-### 5. GitHub personal access token for cron-job.org
+### 4. GitHub personal access token for cron-job.org
 
 Create a classic PAT with the `repo` scope at
 https://github.com/settings/tokens. This token is used **only** inside
 cron-job.org's request headers - never paste it into this repo.
 
-### 6. cron-job.org jobs
+### 5. cron-job.org jobs
 
 Create two jobs at https://cron-job.org, both:
 
@@ -88,9 +105,12 @@ wiring up cron-job.org.
 
 ## Notes
 
-- Posts are self-text only, first-person anecdotes, no links/company
-  names/CTAs - see `config.yaml` for the exact style rules and topic pool.
-- A defensive check (`min_hours_between_posts` in `config.yaml`) refuses to
-  double-post to the subreddit within a configurable window.
+- Posts are first-person anecdotes, no links/company names/CTAs - see
+  `config.yaml` for the exact style rules and fallback topic pool.
 - Re-check r/AWSForStartuppz's current rules occasionally (self-promo
-  policy, posting frequency limits) - subreddit rules can change.
+  policy, posting frequency limits) before posting - subreddit rules can
+  change.
+- You can message the bot a topic at any time (e.g. "write about S3
+  Intelligent-Tiering surprises") - it doesn't wait for the daily cron or
+  an existing pending draft; it just generates and sends that one next.
+- Only messages from the chat matching `TELEGRAM_CHAT_ID` are acted on.

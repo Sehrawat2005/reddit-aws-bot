@@ -1,13 +1,14 @@
-"""Generate a new Reddit draft post via the Groq API and send it for approval."""
+"""Generate a new Reddit draft via Groq - either from a researched trending
+angle, or from a topic the user typed on Telegram - and send it for review."""
 import json
 import os
-import random
 import uuid
 from datetime import datetime, timezone
 
 import requests
 
 import common
+from research import pick_angle
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -18,31 +19,33 @@ no markdown code fences, with exactly two keys: "title" and "body".
 Style rules you must follow:
 {style_rules}
 
-The post should center on this specific angle/topic: "{topic}"
-
+The post should center on this angle: "{topic}"
+{context_block}
 Avoid reusing these exact angles already covered recently: {recent}
 """
 
 
-def pick_topic(config, history):
-    recent_posted = [h.get("topic") for h in history.get("posted", [])]
-    recent_rejected = [h.get("topic") for h in history.get("rejected", [])]
+def recent_topics(config, history):
     n = config.get("history_context_size", 8)
-    recent = (recent_posted + recent_rejected)[-n:]
-
-    available = [t for t in config["topics"] if t not in recent]
-    if not available:
-        available = config["topics"]
-    return random.choice(available), recent
+    return ([h.get("topic") for h in history.get("posted", [])] +
+            [h.get("topic") for h in history.get("rejected", [])])[-n:]
 
 
-def call_groq(config, topic, recent):
+def call_groq(config, topic, context, recent):
     api_key = os.environ["GROQ_API_KEY"]
     style_rules = "\n".join(f"- {r}" for r in config["style_rules"])
+    context_block = (
+        f"\nFor background, here's a recent real AWS announcement related to "
+        f"this angle - use it only as inspiration for a first-person story, "
+        f"never summarize it like a press release or link to it:\n{context}\n"
+        if context
+        else ""
+    )
     system_prompt = SYSTEM_PROMPT.format(
         subreddit=config["subreddit"],
         style_rules=style_rules,
         topic=topic,
+        context_block=context_block,
         recent=", ".join(recent) if recent else "(none yet)",
     )
 
@@ -66,12 +69,8 @@ def call_groq(config, topic, recent):
     return parsed["title"].strip(), parsed["body"].strip()
 
 
-def generate_and_send():
-    config = common.load_config()
-    history = common.load_history()
-
-    topic, recent = pick_topic(config, history)
-    title, body = call_groq(config, topic, recent)
+def _build_send_and_save(config, topic, context, recent):
+    title, body = call_groq(config, topic, context, recent)
 
     draft = {
         "draft_id": uuid.uuid4().hex[:12],
@@ -84,6 +83,25 @@ def generate_and_send():
     common.save_pending_draft(draft)
     common.telegram_send_draft(draft)
     return draft
+
+
+def generate_and_send():
+    """Research a trending (or evergreen fallback) angle and send a draft."""
+    config = common.load_config()
+    history = common.load_history()
+    recent = recent_topics(config, history)
+
+    topic, context = pick_angle(config, recent)
+    return _build_send_and_save(config, topic, context, recent)
+
+
+def generate_for_topic(topic):
+    """Generate a draft for a topic the user typed on Telegram directly."""
+    config = common.load_config()
+    history = common.load_history()
+    recent = recent_topics(config, history)
+
+    return _build_send_and_save(config, topic, None, recent)
 
 
 if __name__ == "__main__":
