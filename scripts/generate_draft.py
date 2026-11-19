@@ -1,13 +1,14 @@
-"""Generate a new Reddit draft post via the Groq API and send it for approval."""
+"""Research a trending angle and generate a new Reddit draft via Groq, then
+send it for Telegram approval."""
 import json
 import os
-import random
 import uuid
 from datetime import datetime, timezone
 
 import requests
 
 import common
+from research import pick_angle
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -18,31 +19,27 @@ no markdown code fences, with exactly two keys: "title" and "body".
 Style rules you must follow:
 {style_rules}
 
-The post should center on this specific angle/topic: "{topic}"
-
+The post should center on this angle: "{topic}"
+{context_block}
 Avoid reusing these exact angles already covered recently: {recent}
 """
 
 
-def pick_topic(config, history):
-    recent_posted = [h.get("topic") for h in history.get("posted", [])]
-    recent_rejected = [h.get("topic") for h in history.get("rejected", [])]
-    n = config.get("history_context_size", 8)
-    recent = (recent_posted + recent_rejected)[-n:]
-
-    available = [t for t in config["topics"] if t not in recent]
-    if not available:
-        available = config["topics"]
-    return random.choice(available), recent
-
-
-def call_groq(config, topic, recent):
+def call_groq(config, topic, context, recent):
     api_key = os.environ["GROQ_API_KEY"]
     style_rules = "\n".join(f"- {r}" for r in config["style_rules"])
+    context_block = (
+        f"\nFor background, here's a recent real AWS announcement related to "
+        f"this angle - use it only as inspiration for a first-person story, "
+        f"never summarize it like a press release or link to it:\n{context}\n"
+        if context
+        else ""
+    )
     system_prompt = SYSTEM_PROMPT.format(
         subreddit=config["subreddit"],
         style_rules=style_rules,
         topic=topic,
+        context_block=context_block,
         recent=", ".join(recent) if recent else "(none yet)",
     )
 
@@ -70,8 +67,12 @@ def generate_and_send():
     config = common.load_config()
     history = common.load_history()
 
-    topic, recent = pick_topic(config, history)
-    title, body = call_groq(config, topic, recent)
+    n = config.get("history_context_size", 8)
+    recent = ([h.get("topic") for h in history.get("posted", [])] +
+              [h.get("topic") for h in history.get("rejected", [])])[-n:]
+
+    topic, context = pick_angle(config, recent)
+    title, body = call_groq(config, topic, context, recent)
 
     draft = {
         "draft_id": uuid.uuid4().hex[:12],

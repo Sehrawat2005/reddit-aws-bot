@@ -81,12 +81,19 @@ def _telegram_call(method, payload=None, params=None):
 
 
 def telegram_send_draft(draft):
-    """Send a draft for approval with Approve/Reject inline buttons."""
+    """Send a draft for approval with Approve/Reject inline buttons.
+
+    Plain text, no parse_mode: the title/body come from the LLM and may
+    contain characters that break Telegram's Markdown/HTML parsing, and
+    plain text is still tap-to-copy friendly.
+    """
     chat_id = os.environ["TELEGRAM_CHAT_ID"]
     text = (
-        f"*New Reddit draft for r/{draft['subreddit']}*\n\n"
-        f"*Title:* {draft['title']}\n\n"
-        f"{draft['body']}"
+        f"New draft for r/{draft['subreddit']} - review below\n"
+        f"----------------------------------------\n"
+        f"TITLE:\n{draft['title']}\n\n"
+        f"BODY:\n{draft['body']}\n"
+        f"----------------------------------------"
     )
     keyboard = {
         "inline_keyboard": [[
@@ -99,7 +106,6 @@ def telegram_send_draft(draft):
         payload={
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": "Markdown",
             "reply_markup": keyboard,
         },
     )
