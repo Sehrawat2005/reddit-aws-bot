@@ -2,11 +2,11 @@
 
 Semi-automated drafting assistant for r/AWSForStartuppz posts. Every day it
 researches a trending AWS angle, drafts an informational post (via Groq),
-and sends it to you on Telegram to Approve or Reject. Once you approve, it
-sends back a clean copy-paste-ready version — **you post it to Reddit
-yourself, manually**. (Reddit closed self-service API app creation in late
-2025; see "Why no auto-posting" below.) Runs entirely on GitHub Actions,
-triggered by cron-job.org pings, so it works even when your laptop is off.
+and sends it to you on Telegram for review. Reply **"done"** and it sends
+back a clean copy-paste-ready version — **you post it to Reddit yourself,
+manually**. (Reddit closed self-service API app creation in late 2025; see
+"Why no auto-posting" below.) Runs entirely on GitHub Actions, triggered by
+cron-job.org pings, so it works even when your laptop is off.
 
 ## How it works
 
@@ -17,17 +17,26 @@ triggered by cron-job.org pings, so it works even when your laptop is off.
     not-yet-used announcement to riff on; if that fails or everything recent
     has already been used, it falls back to the evergreen topic pool in
     `config.yaml`.
-- **Every few minutes** (cron-job.org -> `poll-approvals.yml`): checks if you
-  tapped Approve or Reject on Telegram.
-  - Approve -> sends back the title/body in a copy-paste-ready message. Paste
-    the title into Reddit's title field and the body into the text box,
-    yourself, on reddit.com.
-  - Reject -> discards the draft and immediately researches + sends a new
-    one.
+- **Every few minutes** (cron-job.org -> `poll-approvals.yml`): checks for a
+  text reply on Telegram to the pending draft:
+  - **`done`** -> sends back the title/body in a copy-paste-ready message.
+    Paste the title into Reddit's title field and the body into the text
+    box, yourself, on reddit.com. Logged to `state/history.json` so it's
+    never regenerated.
+  - **`reject`** -> discards the draft and immediately researches + sends a
+    new one.
+  - **anything else** -> treated as a specific topic you want written about.
+    This takes priority over whatever is pending - the current draft (if
+    any) is dropped and a new one is generated for exactly that topic, no
+    matter where things stood.
 
 State (pending draft, Telegram update offset, draft history) lives as JSON
 files in `state/`, committed back to the repo by the Actions bot itself - no
-external database.
+external database. Topics already in `history.json` (posted or rejected)
+are never picked again for the researched/evergreen flow, and a custom
+topic you type gets a heads-up if you've already posted that exact angle
+before (it still generates it - that's an explicit request, not a dedupe
+decision).
 
 ## Why no auto-posting
 
@@ -37,8 +46,8 @@ now requires manual approval from Reddit, which isn't guaranteed or fast.
 Rather than block on that, this bot does everything *except* the final
 submit: you stay the one actually clicking "Post" on reddit.com, which also
 means there's no bot-automation risk to the account at all. If a Reddit API
-app ever gets approved later, `poll_telegram.py`'s `handle_approve` is the
-only place that would need to change to re-add auto-posting.
+app ever gets approved later, `poll_telegram.py`'s `handle_done` is the only
+place that would need to change to re-add auto-posting.
 
 ## One-time setup
 
@@ -101,3 +110,7 @@ wiring up cron-job.org.
 - Re-check r/AWSForStartuppz's current rules occasionally (self-promo
   policy, posting frequency limits) before posting - subreddit rules can
   change.
+- You can message the bot a topic at any time (e.g. "write about S3
+  Intelligent-Tiering surprises") - it doesn't wait for the daily cron or
+  an existing pending draft; it just generates and sends that one next.
+- Only messages from the chat matching `TELEGRAM_CHAT_ID` are acted on.

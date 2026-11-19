@@ -1,5 +1,5 @@
-"""Research a trending angle and generate a new Reddit draft via Groq, then
-send it for Telegram approval."""
+"""Generate a new Reddit draft via Groq - either from a researched trending
+angle, or from a topic the user typed on Telegram - and send it for review."""
 import json
 import os
 import uuid
@@ -23,6 +23,12 @@ The post should center on this angle: "{topic}"
 {context_block}
 Avoid reusing these exact angles already covered recently: {recent}
 """
+
+
+def recent_topics(config, history):
+    n = config.get("history_context_size", 8)
+    return ([h.get("topic") for h in history.get("posted", [])] +
+            [h.get("topic") for h in history.get("rejected", [])])[-n:]
 
 
 def call_groq(config, topic, context, recent):
@@ -63,15 +69,7 @@ def call_groq(config, topic, context, recent):
     return parsed["title"].strip(), parsed["body"].strip()
 
 
-def generate_and_send():
-    config = common.load_config()
-    history = common.load_history()
-
-    n = config.get("history_context_size", 8)
-    recent = ([h.get("topic") for h in history.get("posted", [])] +
-              [h.get("topic") for h in history.get("rejected", [])])[-n:]
-
-    topic, context = pick_angle(config, recent)
+def _build_send_and_save(config, topic, context, recent):
     title, body = call_groq(config, topic, context, recent)
 
     draft = {
@@ -85,6 +83,25 @@ def generate_and_send():
     common.save_pending_draft(draft)
     common.telegram_send_draft(draft)
     return draft
+
+
+def generate_and_send():
+    """Research a trending (or evergreen fallback) angle and send a draft."""
+    config = common.load_config()
+    history = common.load_history()
+    recent = recent_topics(config, history)
+
+    topic, context = pick_angle(config, recent)
+    return _build_send_and_save(config, topic, context, recent)
+
+
+def generate_for_topic(topic):
+    """Generate a draft for a topic the user typed on Telegram directly."""
+    config = common.load_config()
+    history = common.load_history()
+    recent = recent_topics(config, history)
+
+    return _build_send_and_save(config, topic, None, recent)
 
 
 if __name__ == "__main__":
