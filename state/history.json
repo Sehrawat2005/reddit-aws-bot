@@ -1,4 +1,11 @@
 {
-  "posted": [],
+  "posted": [
+    {
+      "draft_id": "d75711bcb642",
+      "topic": "Amazon OpenSearch Memory is now generally available",
+      "title": "How OpenSearch Memory helped a fintech chatbot stay sharp",
+      "approved_at": "2026-11-19T08:41:02.712415+00:00"
+    }
+  ],
   "rejected": []
 }
