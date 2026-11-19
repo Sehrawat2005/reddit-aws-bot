@@ -1,0 +1,8 @@
+{
+  "draft_id": "ebbc1c6e25e8",
+  "subreddit": "AWSForStartuppz",
+  "topic": "Hi",
+  "title": "Hi from my first Lambda hello world",
+  "body": "I was nervous about introducing myself in the new startup Slack channel, so I built a tiny Lambda that sent a \"Hi\" message to the team via SNS. It helped break the ice and taught me a few things about permissions. Lesson: always give the function the least privilege you need – just sns:Publish on the specific topic. Tip: use an inline policy in the role to keep it tidy.",
+  "created_at": "2026-11-19T08:28:33.571548+00:00"
+}
