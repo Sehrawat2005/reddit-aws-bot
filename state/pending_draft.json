@@ -1,0 +1,8 @@
+{
+  "draft_id": "61adbb45205a",
+  "subreddit": "AWSForStartuppz",
+  "topic": "Amazon Aurora DSQL now delivers up to 50% higher write throughput",
+  "title": "How we helped an e‑commerce retailer double their order‑log ingestion with Aurora DSQL",
+  "body": "We were engaged by an e‑commerce retailer whose order‑log table was growing fast. Each purchase generated a new row keyed by a timestamp, and the write‑heavy workload was saturating their Aurora MySQL cluster, causing latency spikes during peak sales.\n\nWe migrated the table to Amazon Aurora DSQL and enabled the new storage‑layer optimizations. By switching to a time‑ordered primary key and leveraging Aurora DSQL’s higher write throughput, we were able to push the write capacity without any schema changes.\n\nThe result? Write throughput increased by roughly 45%, and the nightly batch that previously took 30 minutes now finishes in under 12 minutes. The retailer saw a smoother checkout experience during flash sales and reduced their database scaling costs.",
+  "created_at": "2026-11-20T06:31:20.070192+00:00"
+}
