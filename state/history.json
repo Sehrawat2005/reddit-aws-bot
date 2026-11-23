@@ -7,5 +7,12 @@
       "approved_at": "2026-11-19T08:41:02.712415+00:00"
     }
   ],
-  "rejected": []
+  "rejected": [
+    {
+      "draft_id": "61adbb45205a",
+      "topic": "Amazon Aurora DSQL now delivers up to 50% higher write throughput",
+      "title": "How we helped an e‑commerce retailer double their order‑log ingestion with Aurora DSQL",
+      "rejected_at": "2026-11-23T11:01:33.977625+00:00"
+    }
+  ]
 }
