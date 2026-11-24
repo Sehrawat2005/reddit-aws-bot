@@ -1,8 +1,8 @@
 {
-  "draft_id": "32525770bf62",
+  "draft_id": "b018c426f6b0",
   "subreddit": "AWSForStartuppz",
-  "topic": "Amazon CloudWatch Omni now supports Microsoft Azure platform logs, metrics and traces",
-  "title": "Unified multi‑cloud monitoring for a fintech startup using CloudWatch Omni",
-  "body": "We were engaged by a fintech startup that operated core services both on AWS and Azure. Their ops team was juggling two separate monitoring stacks – CloudWatch for AWS and a third‑party tool for Azure – which meant duplicated dashboards, fragmented alerts, and a painful incident‑response workflow.\n\nWe set up Amazon CloudWatch Omni to ingest Azure resource logs, Azure Monitor metrics, VNet flow logs, and Application Insights traces alongside their existing AWS telemetry. By connecting their Microsoft Entra ID tenant to AWS and configuring the desired subscriptions, we consolidated all telemetry into a single CloudWatch workspace.\n\nThe result was a 45% reduction in mean‑time‑to‑detect incidents and a 30% cut in monitoring tool spend, thanks to eliminating the parallel platform. The team now correlates cross‑cloud latency spikes in one dashboard, speeding up root‑cause analysis without flipping consoles.",
-  "created_at": "2026-11-23T11:01:35.665668+00:00"
+  "topic": "Credits",
+  "title": "Leveraging AWS Credits to Cut Costs for a SaaS Startup",
+  "body": "We recently partnered with a fast‑growing SaaS startup that was hitting a wall on their AWS bill. Their workloads on EC2 and RDS were scaling rapidly, but they hadn’t tapped into the AWS credits they were eligible for, so the monthly spend kept climbing.\n\nWe dug into their usage patterns, mapped each service to the appropriate credit programs (AWS Activate, Compute Savings Plans, and a targeted Aurora Serverless credit bundle), and automated the credit‑application process via CloudFormation. At the same time we right‑sized several under‑utilized instances and moved batch jobs to Spot.\n\nThe result? Within the first two months the startup saw a 35% reduction in its net AWS spend, translating into roughly $150 K of saved costs and $200 K in applied credits. The team can now reinvest that margin into product development rather than infrastructure bills.",
+  "created_at": "2026-11-24T06:54:38.530885+00:00"
 }
