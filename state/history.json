@@ -19,6 +19,12 @@
       "topic": "Amazon Aurora DSQL now delivers up to 50% higher write throughput",
       "title": "How we helped an e‑commerce retailer double their order‑log ingestion with Aurora DSQL",
       "rejected_at": "2026-11-23T11:01:33.977625+00:00"
+    },
+    {
+      "draft_id": "b018c426f6b0",
+      "topic": "Credits",
+      "title": "Leveraging AWS Credits to Cut Costs for a SaaS Startup",
+      "rejected_at": "2026-11-24T06:56:35.378061+00:00"
     }
   ]
 }

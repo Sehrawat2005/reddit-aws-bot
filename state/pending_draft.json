@@ -1,8 +1,8 @@
 {
-  "draft_id": "b018c426f6b0",
+  "draft_id": "33d069284002",
   "subreddit": "AWSForStartuppz",
-  "topic": "Credits",
-  "title": "Leveraging AWS Credits to Cut Costs for a SaaS Startup",
-  "body": "We recently partnered with a fast‑growing SaaS startup that was hitting a wall on their AWS bill. Their workloads on EC2 and RDS were scaling rapidly, but they hadn’t tapped into the AWS credits they were eligible for, so the monthly spend kept climbing.\n\nWe dug into their usage patterns, mapped each service to the appropriate credit programs (AWS Activate, Compute Savings Plans, and a targeted Aurora Serverless credit bundle), and automated the credit‑application process via CloudFormation. At the same time we right‑sized several under‑utilized instances and moved batch jobs to Spot.\n\nThe result? Within the first two months the startup saw a 35% reduction in its net AWS spend, translating into roughly $150 K of saved costs and $200 K in applied credits. The team can now reinvest that margin into product development rather than infrastructure bills.",
-  "created_at": "2026-11-24T06:54:38.530885+00:00"
+  "topic": "AWS WAF introduces simplified pricing",
+  "title": "Taming WAF spend for an e‑commerce retailer with AWS WAF simplified pricing",
+  "body": "We were working with an e‑commerce retailer that was constantly guessing how much their AWS WAF bill would be. Every time they added a new rule or rule group, a separate charge appeared, so the security team kept the rule set minimal and risked exposure.\n\nWe migrated them to the new simplified pricing model, consolidated their web ACLs, and took advantage of the included 2,500 WCU per ACL. We added Bot Control and the Anti‑DDoS rule group—both now cost‑free under the base fee—and switched the billing to the resource‑plus‑request model, which let us see cost impact before any deployment.\n\nThe result was a predictable monthly WAF bill and a 30% reduction in spend, roughly $12 k saved each month, while the rule coverage grew by about 40% and latency stayed flat. The client now feels secure enough to keep the full protection set without worrying about surprise charges.",
+  "created_at": "2026-11-24T06:56:37.564507+00:00"
 }
